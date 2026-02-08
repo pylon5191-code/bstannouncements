@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BST Announcements</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='bstlogo.png') }}">
+</head>
+<body>
+<div class="page fade-up">
+    <header class="header">
+        <div class="logo-row">
+            <img src="{{ url_for('static', filename='bstlogo.png') }}" class="logo" alt="BST Logo">
+            <div class="titles">
+                <h1>Burlington Student Theatre</h1>
+                <h2>Production Announcements</h2>
+            </div>
+        </div>
+        <nav class="nav">
+            <span class="nav-label">Public Board</span>
+            <a href="{{ url_for('admin_login') }}">Admin</a>
+        </nav>
+    </header>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar fade-up">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Little Performers">Little Performers</button>
+        <button class="filter-btn" data-filter="Junior">Junior</button>
+        <button class="filter-btn" data-filter="Intermediate">Intermediate</button>
+        <button class="filter-btn" data-filter="Senior">Senior</button>
+    </div>
+
+    <main class="content">
+        <section class="card fade-up">
+            <h3>Announcements</h3>
+            {% if announcements %}
+                <div class="announcement-list">
+                    {% for a in announcements %}
+                        <article class="announcement-item" data-program="{{ a['program'] }}">
+                            <div class="announcement-header">
+                                <div class="announcement-main">
+                                    <span class="announcement-title">
+                                        {{ a['title'] }} - {{ a['formatted_date'] }}
+                                    </span>
+                                </div>
+                                <div class="announcement-meta">
+                                    {% if a['program'] %}
+                                        <span class="tag">{{ a['program'] }}</span>
+                                    {% else %}
+                                        <span class="tag tag-neutral">General</span>
+                                    {% endif %}
+                                    <button class="toggle-btn" type="button">Details ▾</button>
+                                </div>
+                            </div>
+                            <div class="announcement-body collapsed">
+                                <p>{{ a['body'] | replace('\n', '<br>') | safe }}</p>
+                                <p class="posted-date">Posted on {{ a['formatted_date'] }}</p>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No announcements have been posted yet.</p>
+            {% endif %}
+        </section>
+    </main>
+</div>
+
+<script>
+    // fade-up
+    window.addEventListener("load", () => {
+        document.querySelectorAll(".fade-up").forEach(el => {
+            el.classList.add("fade-up-visible");
+        });
+    });
+
+    // dropdown
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".toggle-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const body = btn.closest(".announcement-item").querySelector(".announcement-body");
+                const collapsed = body.classList.contains("collapsed");
+                body.classList.toggle("collapsed", !collapsed);
+                btn.textContent = collapsed ? "Hide ▴" : "Details ▾";
+            });
+        });
+    });
+
+    // FILTERING
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            const filter = btn.dataset.filter;
+            document.querySelectorAll(".announcement-item").forEach(item => {
+                const program = item.dataset.program || "General";
+                if (filter === "all" || filter === program) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

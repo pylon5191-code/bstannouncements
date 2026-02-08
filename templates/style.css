@@ -1,0 +1,128 @@
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.page {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #e5e7eb;
+}
+
+.header h2 {
+    margin: 4px 0 0;
+    font-size: 1rem;
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.card {
+    background: #020617;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    border: 1px solid #1f2937;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #e5e7eb;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    background: #020617;
+    color: #e5e7eb;
+    font-size: 0.95rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.announcement-body {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #020617;
+    border: 1px solid #1f2937;
+    min-height: 60px;
+    white-space: pre-wrap;
+}
+
+.announcement-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.announcement-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid #111827;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.announcement-list li:last-child {
+    border-bottom: none;
+}
+
+.date {
+    color: #6b7280;
+    margin-left: 8px;
+    white-space: nowrap;
+}
