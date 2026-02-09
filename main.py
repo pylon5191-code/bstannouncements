@@ -529,39 +529,59 @@ def send_announcement_email():
     if not session.get("logged_in"):
         return redirect(url_for("admin_login"))
 
+    recipients = None
+
     if request.method == "POST":
-        csv_file = request.files.get("csv")
         subject = request.form.get("subject", "").strip()
         body = request.form.get("body", "").strip()
+        enable_csv = request.form.get("enable_csv")
 
-        if not csv_file or not subject or not body:
-            flash("CSV, subject, and body are required.", "error")
+        if not subject or not body:
+            flash("Subject and body are required.", "error")
             return redirect(request.url)
 
-        recipients = []
+        recipients_list = []
 
-        try:
-            stream = csv_file.stream.read().decode("utf-8").splitlines()
-            reader = csv.reader(stream)
+        if enable_csv and "csv" in request.files:
+            csv_file = request.files["csv"]
+            if csv_file.filename == "":
+                flash("CSV file is empty.", "error")
+                return redirect(request.url)
 
-            for row in reader:
-                if row and "@" in row[0]:
-                    recipients.append(row[0].strip())
+            try:
+                stream = csv_file.stream.read().decode("utf-8").splitlines()
+                reader = csv.reader(stream)
+                for row in reader:
+                    if row and "@" in row[0]:
+                        recipients_list.append(row[0].strip())
+            except Exception as e:
+                flash("Error processing CSV file.", "error")
+                return redirect(request.url)
 
-        except Exception as e:
-            flash("Invalid CSV file.", "error")
-            return redirect(request.url)
+        # Only show preview if CSV is used
+        if enable_csv:
+            recipients = recipients_list
+            return render_template(
+                "announcements/announcements.html",
+                recipients=recipients,
+                login_only=False,
+                drafts=get_drafts(),
+                announcements=get_admin_published(),
+                editing_draft=None
+            )
 
-        if not recipients:
-            flash("No valid emails found.", "error")
-            return redirect(request.url)
+        # If CSV not used, treat as a general email
+        flash("No CSV uploaded. Nothing processed.", "info")
+        return redirect(request.url)
 
-        send_bulk_email(subject, body, recipients)
+    return render_template(
+        "announcements/announcements.html",
+        login_only=False,
+        drafts=get_drafts(),
+        announcements=get_admin_published(),
+        editing_draft=None
+    )
 
-        flash(f"Announcement sent to {len(recipients)} recipients.", "success")
-        return redirect(url_for("admin"))
-
-    return render_template("announcements/send_email.html")
 
 
 @app.route("/announcements")
@@ -743,6 +763,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
