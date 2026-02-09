@@ -509,7 +509,7 @@ ADMIN_NAMES = {"Rainer", "Elaine", "Evan"}
 def announcements():
     # This will display real announcements
     published = get_published_announcements()
-    return render_template("Announcements/announcements.html", announcements=published)
+    return render_template("announcements/announcements.html", announcements=published)
 
 
 # ---------------- LOGIN WIZARD ---------------- #
@@ -684,6 +684,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
