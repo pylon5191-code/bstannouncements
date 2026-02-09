@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Theatre</title>
+    <title>Student Theatre Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Poppins -->
@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='announcements.css') }}">
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='bstlogo.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='bstlogo.png') }}">
 </head>
 <body>
 <div class="page fade-up">
@@ -24,133 +24,153 @@
             </div>
         </div>
         <nav class="nav">
-            "<a href="{{ url_for('announcements') }}">Public Board</a>
-            {% if not login_only %}
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% endif %}
+            <a href="{{ url_for('announcements') }}">Public Board</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
         </nav>
     </header>
 
     <main class="content">
-        {% if login_only %}
-            <section class="card fade-up">
-                <h3>Admin Login</h3>
-                {% if error %}
-                    <p class="error-text">{{ error }}</p>
+        <!-- New Announcement / Edit Draft -->
+        <section class="card fade-up">
+            <h3>{% if editing_draft %}Edit Draft{% else %}New Announcement{% endif %}</h3>
+            <form method="POST" class="form">
+                {% if editing_draft %}
+                    <input type="hidden" name="announcement_id" value="{{ editing_draft['id'] }}">
                 {% endif %}
-                <form method="POST" class="form">
-                    <label for="password">Password</label>
-                    <input id="password" type="password" name="password" required>
-                    <div class="button-row">
-                        <button type="submit" class="btn primary">Login</button>
-                    </div>
-                </form>
-            </section>
-        {% else %}
-            <section class="card fade-up">
-                <h3>{% if editing_draft %}Edit Draft{% else %}New Announcement{% endif %}</h3>
-                <form method="POST" class="form">
-                    {% if editing_draft %}
-                        <input type="hidden" name="announcement_id" value="{{ editing_draft['id'] }}">
-                    {% endif %}
 
-                    <label for="title">Title</label>
-                    <input id="title" type="text" name="title" required
-                           value="{{ editing_draft['title'] if editing_draft else '' }}">
+                <label for="title">Title</label>
+                <input id="title" type="text" name="title" required
+                       value="{{ editing_draft['title'] if editing_draft else '' }}">
 
-                    <label for="program">Program</label>
-                    <select id="program" name="program">
-                        <option value="">General</option>
-                        {% set programs = ['Little Performers', 'Junior', 'Intermediate', 'Senior'] %}
-                        {% for p in programs %}
-                            <option value="{{ p }}"
-                                {% if editing_draft and editing_draft['program'] == p %}selected{% endif %}>
-                                {{ p }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <label for="program">Program</label>
+                <select id="program" name="program">
+                    <option value="">General</option>
+                    {% set programs = ['Little Performers', 'Junior', 'Intermediate', 'Senior'] %}
+                    {% for p in programs %}
+                        <option value="{{ p }}"
+                            {% if editing_draft and editing_draft['program'] == p %}selected{% endif %}>
+                            {{ p }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-                    <label for="body">Announcement Description</label>
-                    <textarea id="body" name="body" rows="5" required>{{ editing_draft['body'] if editing_draft else '' }}</textarea>
+                <label for="body">Announcement Description</label>
+                <textarea id="body" name="body" rows="5" required>{{ editing_draft['body'] if editing_draft else '' }}</textarea>
 
-                    <div class="button-row">
-                        <button type="submit" name="submit_type" value="submit" class="btn primary">
-                            Submit Announcement
-                        </button>
-                        <button type="submit" name="submit_type" value="draft" class="btn secondary">
-                            Save as Draft
-                        </button>
-                    </div>
-                </form>
-            </section>
+                <div class="button-row">
+                    <button type="submit" name="submit_type" value="submit" class="btn primary">Submit Announcement</button>
+                    <button type="submit" name="submit_type" value="draft" class="btn secondary">Save as Draft</button>
+                </div>
+            </form>
+        </section>
 
-            <section class="card fade-up">
-                <h3>Drafts</h3>
-                {% if drafts %}
-                    <ul class="announcement-list simple-list">
-                        {% for d in drafts %}
-                            <li>
-                                <div>
-                                    <strong>{{ d['title'] }}</strong>
-                                    {% if d['program'] %}
-                                        <span class="tag small">{{ d['program'] }}</span>
+        <!-- Drafts -->
+        <section class="card fade-up">
+            <h3>Drafts</h3>
+            {% if drafts %}
+                <ul class="announcement-list simple-list">
+                    {% for d in drafts %}
+                        <li>
+                            <div>
+                                <strong>{{ d['title'] }}</strong>
+                                {% if d['program'] %}
+                                    <span class="tag small">{{ d['program'] }}</span>
+                                {% endif %}
+                                <span class="draft-date">{{ d['formatted_date'] }}</span>
+                            </div>
+                            <a class="btn tiny" href="{{ url_for('admin', draft_id=d['id']) }}">Open Draft</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No drafts saved.</p>
+            {% endif %}
+        </section>
+
+        <!-- Published Announcements -->
+        <section class="card fade-up">
+            <h3>Published Announcements</h3>
+            {% if announcements %}
+                <ul class="announcement-list simple-list">
+                    {% for a in announcements %}
+                        <li>
+                            <div>
+                                <strong>{{ a['title'] }}</strong>
+                                {% if a['program'] %}
+                                    <span class="tag small">{{ a['program'] }}</span>
+                                {% endif %}
+                                <span class="draft-date">{{ a['formatted_date'] }}</span>
+                                {% if a['is_hidden'] == 1 %}
+                                    <span class="status hidden-status">Hidden</span>
+                                {% else %}
+                                    <span class="status active-status">Active</span>
+                                {% endif %}
+                            </div>
+                            <div class="menu-container">
+                                <button class="menu-btn" type="button">⋮</button>
+                                <div class="menu-dropdown">
+                                    {% if a['is_hidden'] == 0 %}
+                                        <a href="{{ url_for('hide_announcement', aid=a['id']) }}">Hide</a>
                                     {% endif %}
-                                    <span class="draft-date">{{ d['formatted_date'] }}</span>
+                                    <a href="{{ url_for('delete_announcement', aid=a['id']) }}">Delete</a>
                                 </div>
-                                <a class="btn tiny" href="{{ url_for('admin', draft_id=d['id']) }}">Open Draft</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>No drafts saved.</p>
-                {% endif %}
-            </section>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No published announcements yet.</p>
+            {% endif %}
+        </section>
 
-            <section class="card fade-up">
-    <h3>Published Announcements</h3>
-    {% if announcements %}
-        <ul class="announcement-list simple-list">
-            {% for a in announcements %}
-                <li>
-                    <div>
-                        <strong>{{ a['title'] }}</strong>
-                        {% if a['program'] %}
-                            <span class="tag small">{{ a['program'] }}</span>
-                        {% endif %}
-                        <span class="draft-date">{{ a['formatted_date'] }}</span>
+        <!-- SEND ANNOUNCEMENT EMAIL -->
+        <section class="card fade-up">
+            <h3>Send Announcement Email</h3>
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('send_announcement_email') }}" class="form">
+                <label>
+                    <input type="checkbox" id="enable_csv" name="enable_csv">
+                    Enable CSV Upload
+                </label>
 
-                        {% if a['is_hidden'] == 1 %}
-                            <span class="status hidden-status">Hidden</span>
-                        {% else %}
-                            <span class="status active-status">Active</span>
-                        {% endif %}
-                    </div>
+                <div id="csv_upload_section" style="display:none; margin-top:10px;">
+                    <label for="csv">Upload CSV of recipients</label>
+                    <input type="file" id="csv" name="csv" accept=".csv">
 
-                    <div class="menu-container">
-                        <button class="menu-btn" type="button">⋮</button>
-                        <div class="menu-dropdown">
-                            {% if a['is_hidden'] == 0 %}
-                                <a href="{{ url_for('hide_announcement', aid=a['id']) }}">Hide</a>
-                            {% endif %}
-                            <a href="{{ url_for('delete_announcement', aid=a['id']) }}">Delete</a>
+                    {% if recipients %}
+                        <div class="recipients-preview">
+                            <strong>Recipients:</strong>
+                            <ul>
+                                {% for r in recipients %}
+                                    <li>{{ r }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No published announcements yet.</p>
-    {% endif %}
-</section>
+                    {% endif %}
+                </div>
 
-        {% endif %}
+                <label for="subject">Email Subject</label>
+                <input type="text" id="subject" name="subject" required>
+
+                <label for="body_email">Email Body</label>
+                <textarea id="body_email" name="body" rows="5" required></textarea>
+
+                <div class="button-row">
+                    <button type="submit" class="btn primary">Process & Preview Recipients</button>
+                </div>
+            </form>
+        </section>
     </main>
 </div>
 
 <script>
     window.addEventListener("load", () => {
-        document.querySelectorAll(".fade-up").forEach(el => {
-            el.classList.add("fade-up-visible");
+        document.querySelectorAll(".fade-up").forEach(el => el.classList.add("fade-up-visible"));
+
+        const checkbox = document.getElementById("enable_csv");
+        const uploadSection = document.getElementById("csv_upload_section");
+
+        checkbox.addEventListener("change", () => {
+            uploadSection.style.display = checkbox.checked ? "block" : "none";
         });
     });
 
