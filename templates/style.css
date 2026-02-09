@@ -1,0 +1,258 @@
+/* ===== GLOBAL ===== */
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+a {
+    color: #93c5fd;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== PAGE WRAPPER ===== */
+
+.page {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+/* ===== TOPBAR ===== */
+
+.topbar {
+    width: 100%;
+    height: 56px;
+    background: #020617;
+    border-bottom: 1px solid #1f2937;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.topbar-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e5e7eb;
+}
+
+.topbar-right a {
+    margin-left: 12px;
+    font-size: 0.9rem;
+    color: #e5e7eb;
+}
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: #111827;
+    color: #e5e7eb;
+    border: 1px solid #1f2937;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition:
+        background 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.15s ease;
+}
+
+.button:hover {
+    background: #1a2336;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+}
+
+.button-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    background: #1f2937;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* ===== HEADER ===== */
+
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #e5e7eb;
+}
+
+.header h2 {
+    margin: 4px 0 0;
+    font-size: 1rem;
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* ===== CARD ===== */
+
+.card {
+    background: #020617;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    border: 1px solid #1f2937;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #e5e7eb;
+}
+
+/* ===== FORMS ===== */
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+input[type="text"],
+input[type="password"],
+textarea,
+select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    background: #020617;
+    color: #e5e7eb;
+    font-size: 0.95rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+/* ===== BUTTONS ===== */
+
+button,
+.btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    display: inline-block;
+}
+
+button:hover,
+.btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+button:active,
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: #1e293b;
+    border: 1px solid #334155;
+}
+
+.btn-secondary:hover {
+    background: #334155;
+}
+
+/* ===== FLASH MESSAGES ===== */
+
+.flash-container {
+    margin-bottom: 12px;
+}
+
+.flash {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.flash-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fecaca;
+}
+
+.flash-success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #bbf7d0;
+}
+
+/* ===== MODAL ===== */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal-backdrop.visible {
+    display: flex;
+}
+
+.modal {
+    background: #020617;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 380px;
+    border: 1px solid #1f2937;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}

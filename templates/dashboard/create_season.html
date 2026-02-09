@@ -1,0 +1,1069 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<style>
+/* ========================= */
+/*     CREATE SEASON PAGE     */
+/* ========================= */
+
+.season-header {
+  margin-bottom: 25px;
+}
+
+.season-header h1 {
+  font-size: 38px;
+  font-weight: 900;
+  margin: 0;
+  color: #f2f6ff;
+}
+
+.season-header p {
+  margin-top: 10px;
+  font-size: 15px;
+  color: rgba(230, 235, 255, 0.72);
+  max-width: 850px;
+  line-height: 1.6;
+}
+
+.note-block {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(15, 19, 32, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  font-size: 14px;
+  color: rgba(230, 235, 255, 0.75);
+  line-height: 1.6;
+}
+
+.note-block strong {
+  color: rgba(77, 163, 255, 0.95);
+  font-weight: 800;
+}
+
+/* ========================= */
+/*       MAIN BUTTON          */
+/* ========================= */
+
+.create-season-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(77, 163, 255, 0.15);
+  border: 1px solid rgba(77, 163, 255, 0.25);
+  color: rgba(230, 235, 255, 0.92);
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  margin-top: 20px;
+}
+
+.create-season-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(77, 163, 255, 0.22);
+  border-color: rgba(77, 163, 255, 0.45);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.create-season-btn span {
+  font-size: 18px;
+}
+
+/* ========================= */
+/*      FORM CONTAINER        */
+/* ========================= */
+
+.season-form-wrap {
+  margin-top: 25px;
+  border-radius: 22px;
+  background: rgba(15, 19, 32, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  padding: 22px;
+  display: none;
+}
+
+.season-form-wrap.active {
+  display: block;
+}
+
+/* ========================= */
+/*         ACCORDION          */
+/* ========================= */
+
+.accordion-section {
+  margin-bottom: 14px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 12, 20, 0.35);
+}
+
+.accordion-header {
+  padding: 16px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: rgba(240, 245, 255, 0.95);
+  transition: 0.2s ease;
+}
+
+.accordion-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.accordion-header small {
+  font-weight: 600;
+  font-size: 12px;
+  color: rgba(230, 235, 255, 0.60);
+}
+
+.accordion-body {
+  padding: 18px;
+  display: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.accordion-body.active {
+  display: block;
+}
+
+.accordion-arrow {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* ========================= */
+/*         INPUTS             */
+/* ========================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(230, 235, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 14px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(20, 24, 40, 0.55);
+  color: #f2f6ff;
+  font-size: 14px;
+  outline: none;
+  backdrop-filter: blur(14px);
+  transition: 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: rgba(77, 163, 255, 0.55);
+  box-shadow: 0 0 0 4px rgba(77, 163, 255, 0.12);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+/* ========================= */
+/*          TABLES            */
+/* ========================= */
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.staff-table th {
+  text-align: left;
+  padding: 12px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(230, 235, 255, 0.70);
+}
+
+.staff-table td {
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.staff-table input {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(20, 24, 40, 0.55);
+  color: rgba(240, 245, 255, 0.95);
+  outline: none;
+}
+
+.add-row-btn {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(240, 245, 255, 0.85);
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.add-row-btn:hover {
+  border-color: rgba(77, 163, 255, 0.35);
+  background: rgba(77, 163, 255, 0.10);
+}
+
+/* ========================= */
+/*      UPLOAD BOX STYLE      */
+/* ========================= */
+
+.upload-box {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  background: rgba(20, 24, 40, 0.45);
+  text-align: center;
+}
+
+.upload-box h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(240, 245, 255, 0.95);
+}
+
+.upload-box p {
+  margin-top: 8px;
+  font-size: 13px;
+  color: rgba(230, 235, 255, 0.65);
+  line-height: 1.5;
+}
+
+.upload-box input {
+  margin-top: 12px;
+}
+
+/* ========================= */
+/*        FORM FOOTER         */
+/* ========================= */
+
+.form-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  padding: 13px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(240, 245, 255, 0.85);
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(77, 163, 255, 0.35);
+  background: rgba(77, 163, 255, 0.10);
+}
+
+.btn-primary {
+  padding: 13px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(77, 163, 255, 0.28);
+  background: rgba(77, 163, 255, 0.18);
+  color: rgba(240, 245, 255, 0.95);
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(77, 163, 255, 0.50);
+  background: rgba(77, 163, 255, 0.25);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+/* ========================= */
+/*     PRIOR SEASONS LIST     */
+/* ========================= */
+
+.prior-title {
+  margin-top: 35px;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(240, 245, 255, 0.92);
+}
+
+.season-cards {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.season-card {
+  border-radius: 20px;
+  background: rgba(15, 19, 32, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px;
+  backdrop-filter: blur(16px);
+  transition: 0.2s ease;
+}
+
+.season-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(77, 163, 255, 0.28);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.season-card h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 900;
+  color: rgba(240, 245, 255, 0.95);
+}
+
+.season-card p {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(230, 235, 255, 0.70);
+}
+
+.tag-pill {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  background: rgba(77, 163, 255, 0.10);
+  border: 1px solid rgba(77, 163, 255, 0.20);
+  color: rgba(77, 163, 255, 0.95);
+}
+
+.tag-pill.draft {
+  background: rgba(255, 200, 90, 0.10);
+  border: 1px solid rgba(255, 200, 90, 0.22);
+  color: rgba(255, 200, 90, 0.95);
+}
+/* ========================= */
+/*           TOAST            */
+/* ========================= */
+
+.bst-toast {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 9999;
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: 0.35s ease;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(15, 19, 32, 0.75);
+  color: rgba(240,245,255,0.95);
+  max-width: 360px;
+}
+
+.bst-toast.show {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+.bst-toast.success {
+  border-color: rgba(100, 255, 150, 0.25);
+}
+
+.bst-toast.warn {
+  border-color: rgba(255, 200, 90, 0.25);
+}
+
+.bst-toast.error {
+  border-color: rgba(255, 100, 100, 0.30);
+}
+
+.bst-toast.info {
+  border-color: rgba(77, 163, 255, 0.30);
+}
+
+/* ========================= */
+/*        DEPLOY MODAL        */
+/* ========================= */
+
+.deploy-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(14px);
+  z-index: 9998;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.deploy-modal.active {
+  display: flex;
+}
+
+.deploy-modal-box {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 22px;
+  padding: 22px;
+  background: rgba(15, 19, 32, 0.92);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 25px 70px rgba(0,0,0,0.75);
+}
+
+.deploy-modal-box h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(240,245,255,0.95);
+}
+
+.deploy-modal-box p {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(230,235,255,0.72);
+}
+
+.deploy-modal-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+html, body {
+  height: 100%;
+  overflow: auto;
+}
+
+.dashboard-main {
+  overflow-y: auto;
+  height: calc(100vh - 80px);
+  padding-bottom: 80px;
+}
+
+/* ========================= */
+/*      DEPLOY LOADING        */
+/* ========================= */
+
+.deploy-loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.70);
+  backdrop-filter: blur(18px);
+  z-index: 9999;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.deploy-loading.active {
+  display: flex;
+}
+
+.deploy-loading-box {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 22px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(15, 19, 32, 0.92);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 25px 70px rgba(0,0,0,0.75);
+}
+
+.deploy-loading-box h3 {
+  margin: 16px 0 0 0;
+  font-size: 18px;
+  font-weight: 900;
+  color: rgba(240,245,255,0.95);
+}
+
+.deploy-loading-box p {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(230,235,255,0.70);
+  line-height: 1.5;
+}
+
+.spinner {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.12);
+  border-top: 4px solid rgba(77, 163, 255, 0.95);
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ========================= */
+/*         RESPONSIVE         */
+/* ========================= */
+
+@media (max-width: 950px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .full-width {
+    grid-column: span 1;
+  }
+  .season-cards {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="season-header fade-up delay-1">
+  <h1>Season Management</h1>
+  <p>
+    Below you can create, configure, and deploy an upcoming Burlington Student Theatre season.
+    This panel allows production leadership to organize staffing, rehearsal schedules, contact lists,
+    and show information in one secure system.
+  </p>
+
+  <div class="note-block fade-up delay-2">
+    <strong>Notes:</strong>
+    Every season you deploy becomes accessible from the main dashboard season selector.
+    Draft seasons can be edited later before deployment, ensuring your season is fully prepared
+    before opening access to staff.
+  </div>
+
+  <button class="create-season-btn fade-up delay-3" onclick="toggleSeasonForm()">
+    <span>＋</span> Create a New Season
+  </button>
+</div>
+
+<!-- CREATE FORM -->
+<div id="seasonFormWrap" class="season-form-wrap fade-up delay-4">
+
+<form method="POST" action="{{ url_for('create_season') }}" enctype="multipart/form-data">
+
+    <!-- BASIC INFO -->
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAccordion('basicInfo')">
+        Basic Information
+        <span class="accordion-arrow" id="arrow-basicInfo">▾</span>
+      </div>
+      <div class="accordion-body" id="basicInfo">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Season Title (Required)</label>
+            <input type="text" name="season_title" placeholder="Example: BST Production Season" required>
+          </div>
+
+          <div class="form-group">
+            <label>Season Year (Required)</label>
+            <input type="text" name="season_year" placeholder="Example: 2025-2026" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Shows Included (Required)</label>
+            <select name="shows" required>
+              <option value="all" selected>Studioworks, Mainstage, Spring Salute, Arts Camp Session 1, Arts Camp Session 2</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STAFFING -->
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAccordion('staffInfo')">
+        Staffing Information
+        <span class="accordion-arrow" id="arrow-staffInfo">▾</span>
+      </div>
+      <div class="accordion-body" id="staffInfo">
+
+        <h3 style="margin-top:0; font-weight:900; color:rgba(240,245,255,0.95);">
+          Production Staff (Required)
+        </h3>
+
+        <table class="staff-table" id="staffTable">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Role</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input name="staff_name_1" placeholder="Full Name" required></td>
+              <td><input name="staff_role_1" placeholder="Role" required></td>
+              <td><input name="staff_email_1" placeholder="Email" required></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button type="button" class="add-row-btn" onclick="addStaffRow()">
+          + Add Staff Row
+        </button>
+
+        <hr style="margin:22px 0; border:1px solid rgba(255,255,255,0.06);">
+
+        <h3 style="margin-top:0; font-weight:900; color:rgba(240,245,255,0.95);">
+          Volunteer Crew (Optional)
+        </h3>
+
+        <table class="staff-table" id="volunteerTable">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Role</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input name="vol_name_1" placeholder="Full Name"></td>
+              <td><input name="vol_role_1" placeholder="Role"></td>
+              <td><input name="vol_email_1" placeholder="Email"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button type="button" class="add-row-btn" onclick="addVolunteerRow()">
+          + Add Volunteer Row
+        </button>
+
+      </div>
+    </div>
+
+    <!-- SHOW INFO -->
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAccordion('showInfo')">
+        Show Information
+        <span class="accordion-arrow" id="arrow-showInfo">▾</span>
+      </div>
+      <div class="accordion-body" id="showInfo">
+
+        {% set shows = ["Studioworks", "Spring Salute", "Mainstage", "Arts Camp 1", "Arts Camp 2"] %}
+
+        {% for show in shows %}
+        <div style="margin-bottom:22px; padding:18px; border-radius:18px; border:1px solid rgba(255,255,255,0.08); background:rgba(10,12,20,0.35);">
+          <h3 style="margin-top:0; font-weight:900; color:rgba(77,163,255,0.95);">{{ show }}</h3>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Show Title (Required)</label>
+              <input type="text" name="{{ show|lower|replace(' ', '_') }}_title" required>
+            </div>
+
+            <div class="form-group">
+              <label>Show Director (Required)</label>
+              <input type="text" name="{{ show|lower|replace(' ', '_') }}_director" required>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Production Staff Working On It (Required)</label>
+              <input type="text" name="{{ show|lower|replace(' ', '_') }}_staff" placeholder="Example: Rainer, Evan, Sam" required>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Show Dates (Required)</label>
+              <input type="text" name="{{ show|lower|replace(' ', '_') }}_dates" placeholder="Click to select dates (calendar coming soon)" required>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Extra Information (Optional)</label>
+              <textarea name="{{ show|lower|replace(' ', '_') }}_extra" placeholder="Any extra notes about this show..."></textarea>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <!-- REHEARSALS -->
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAccordion('rehearsals')">
+        Rehearsal Scheduling
+        <span class="accordion-arrow" id="arrow-rehearsals">▾</span>
+      </div>
+      <div class="accordion-body" id="rehearsals">
+
+        {% set groups = ["Senior", "Intermediate", "Junior", "Little Performer"] %}
+
+        {% for group in groups %}
+        <div style="margin-bottom:18px;">
+          <h3 style="margin:0 0 10px 0; font-weight:900; color:rgba(240,245,255,0.92);">
+            {{ group }} Rehearsals
+          </h3>
+
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Dates + Time Range (Required)</label>
+              <input type="text"
+                     name="{{ group|lower|replace(' ', '_') }}_rehearsals"
+                     placeholder="Example: Sept 12 4:00PM - 7:00PM, Sept 14 5:00PM - 8:00PM"
+                     required>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <!-- CONTACT LIST -->
+    <div class="accordion-section">
+      <div class="accordion-header" onclick="toggleAccordion('contacts')">
+        Contact List
+        <span class="accordion-arrow" id="arrow-contacts">▾</span>
+      </div>
+      <div class="accordion-body" id="contacts">
+
+        <div class="upload-box">
+          <h4>Senior Contact Upload</h4>
+          <p>
+            Upload a CSV file formatted as:
+            <br><b>NAME | EMAIL | PHONE NUMBER</b>
+            <br>
+            Once uploaded, it will automatically be converted into a staff-accessible table.
+          </p>
+
+          <input type="file" name="senior_contacts_csv" accept=".csv">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="form-footer">
+      <button type="submit" name="action" value="draft" class="btn-secondary">
+        Save Season as Draft
+      </button>
+
+      <button type="submit" name="action" value="deploy" class="btn-primary">
+        Deploy Season
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<!-- PRIOR SEASONS -->
+<h2 class="prior-title fade-up delay-4">Previous Seasons</h2>
+
+<div class="season-cards fade-up delay-5">
+
+  <!-- PLACEHOLDER CARD EXAMPLES -->
+<div class="season-card" onclick="openDraftSeason(this)"
+     style="cursor:pointer;"
+     data-title="2023-2024 Season"
+     data-year="2023-2024">
+
+  <h3>2023-2024 Season</h3>
+  <p>
+    <b>Studioworks:</b> TBD<br>
+    <b>Spring Salute:</b> TBD<br>
+    <b>Mainstage:</b> TBD<br>
+    <b>Arts Camp:</b> Session 1 & Session 2
+  </p>
+
+  <span class="tag-pill draft">Draft</span>
+</div>
+
+
+<script>
+
+/* ========================= */
+/*     FORM TOGGLE            */
+/* ========================= */
+function toggleSeasonForm() {
+  const wrap = document.getElementById("seasonFormWrap");
+  wrap.classList.toggle("active");
+
+  if (wrap.classList.contains("active")) {
+  }
+}
+
+/* ========================= */
+/*     ACCORDION TOGGLE       */
+/* ========================= */
+function toggleAccordion(id) {
+  const body = document.getElementById(id);
+  const arrow = document.getElementById("arrow-" + id);
+
+  body.classList.toggle("active");
+
+  if (body.classList.contains("active")) {
+    arrow.innerHTML = "▴";
+  } else {
+    arrow.innerHTML = "▾";
+  }
+}
+
+/* ========================= */
+/*     TABLE ROW ADDING       */
+/* ========================= */
+let staffRowCount = 1;
+let volunteerRowCount = 1;
+
+function addStaffRow() {
+  if (staffRowCount >= 20) {
+    showToast("Maximum 20 production staff rows allowed.", "warn");
+    return;
+  }
+
+  staffRowCount++;
+  const table = document.getElementById("staffTable").querySelector("tbody");
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td><input name="staff_name_${staffRowCount}" placeholder="Full Name" required></td>
+    <td><input name="staff_role_${staffRowCount}" placeholder="Role" required></td>
+    <td><input name="staff_email_${staffRowCount}" placeholder="Email" required></td>
+  `;
+
+  table.appendChild(row);
+}
+
+function addVolunteerRow() {
+  if (volunteerRowCount >= 20) {
+    showToast("Maximum 20 volunteer crew rows allowed.", "warn");
+    return;
+  }
+
+  volunteerRowCount++;
+  const table = document.getElementById("volunteerTable").querySelector("tbody");
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td><input name="vol_name_${volunteerRowCount}" placeholder="Full Name"></td>
+    <td><input name="vol_role_${volunteerRowCount}" placeholder="Role"></td>
+    <td><input name="vol_email_${volunteerRowCount}" placeholder="Email"></td>
+  `;
+
+  table.appendChild(row);
+}
+
+/* ========================= */
+/*         TOAST UI           */
+/* ========================= */
+function showToast(message, type="info") {
+  const toast = document.getElementById("bstToast");
+  const toastText = document.getElementById("bstToastText");
+
+  toast.classList.remove("show");
+  toast.classList.remove("success", "warn", "error", "info");
+
+  toast.classList.add(type);
+  toastText.innerText = message;
+
+  setTimeout(() => toast.classList.add("show"), 50);
+  setTimeout(() => toast.classList.remove("show"), 3500);
+}
+
+/* ========================= */
+/*   REQUIRED FIELD CHECK     */
+/* ========================= */
+function checkRequiredFields(form) {
+  const requiredFields = form.querySelectorAll("[required]");
+  let allGood = true;
+
+  requiredFields.forEach(field => {
+    if (!field.value.trim()) {
+      allGood = false;
+      field.style.borderColor = "rgba(255, 100, 100, 0.55)";
+    } else {
+      field.style.borderColor = "rgba(255, 255, 255, 0.10)";
+    }
+  });
+
+  return allGood;
+}
+
+/* ========================= */
+/*      DEPLOY CONFIRM        */
+/* ========================= */
+function openDeployConfirm() {
+  document.getElementById("deployModal").classList.add("active");
+}
+
+function closeDeployConfirm() {
+  document.getElementById("deployModal").classList.remove("active");
+}
+
+/* ========================= */
+/*     DEPLOY LOADING UI      */
+/* ========================= */
+function showDeployLoading() {
+  document.getElementById("deployLoading").classList.add("active");
+}
+
+function hideDeployLoading() {
+  document.getElementById("deployLoading").classList.remove("active");
+}
+
+/* ========================= */
+/*    FORM SUBMIT HANDLING    */
+/* ========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("#seasonFormWrap form");
+
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    const action = e.submitter?.value;
+
+    // DRAFT SUBMIT
+    if (action === "draft") {
+      if (!checkRequiredFields(form)) {
+        e.preventDefault();
+        showToast("Some required fields are missing. Please complete them before saving.", "warn");
+        return;
+      }
+
+      showToast("Season saved as draft.", "success");
+      return;
+    }
+
+    // DEPLOY SUBMIT
+    if (action === "deploy") {
+      e.preventDefault();
+
+      if (!checkRequiredFields(form)) {
+        showToast("All required fields must be completed before deployment.", "error");
+        return;
+      }
+
+      openDeployConfirm();
+    }
+  });
+});
+
+/* ========================= */
+/*     CONFIRM DEPLOY         */
+/* ========================= */
+function confirmDeploy() {
+  closeDeployConfirm();
+  showDeployLoading();
+
+  showToast("Deploying season... please wait.", "info");
+
+  // Fake 15 second deployment loader
+  setTimeout(() => {
+    hideDeployLoading();
+    showToast("Season deployed successfully!", "success");
+
+    // Now actually submit form
+    document.querySelector("#seasonFormWrap form").submit();
+  }, 15000);
+}
+
+/* ========================= */
+/*  OPEN EXISTING DRAFTS UI   */
+/* ========================= */
+/* This will fill the form from the draft card's dataset */
+function openDraftSeason(card) {
+  toggleSeasonForm();
+
+  const title = card.dataset.title;
+  const year = card.dataset.year;
+
+  document.querySelector("input[name='season_title']").value = title;
+  document.querySelector("input[name='season_year']").value = year;
+
+  showToast("Draft loaded. You can now edit and deploy.", "success");
+
+  // Auto-open the first accordion
+  toggleAccordion("basicInfo");
+}
+</script>
+
+<!-- TOAST -->
+<div id="bstToast" class="bst-toast">
+  <span id="bstToastText">Toast message</span>
+</div>
+
+<!-- DEPLOY MODAL -->
+<div id="deployModal" class="deploy-modal">
+  <div class="deploy-modal-box">
+    <h2>Deploy Season?</h2>
+    <p>
+      Are you sure you want to deploy this season?
+      Once deployed, staff will be able to access it from the dashboard.
+    </p>
+
+    <div class="deploy-modal-actions">
+      <button type="button" class="btn-secondary" onclick="closeDeployConfirm()">Cancel</button>
+      <button type="button" class="btn-primary" onclick="confirmDeploy()">Yes, Deploy</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEPLOY LOADING OVERLAY -->
+<div id="deployLoading" class="deploy-loading">
+  <div class="deploy-loading-box">
+    <div class="spinner"></div>
+    <h3>Deploying Season...</h3>
+    <p>Please wait while we finalize your season configuration.</p>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<div class="main" style="overflow-y:auto; max-height:calc(100vh - 80px); padding:20px;">
+
+    <!-- Header -->
+    <div class="header fade-up delay-1" style="display:flex; justify-content:space-between; flex-wrap: wrap; align-items:center; margin-bottom:20px;">
+        <h1>Manage Team</h1>
+        <button id="saveAllBtn" style="padding:10px 18px; border-radius:12px; background:var(--blue); color:white; font-weight:600; margin-top:5px;">Save All</button>
+    </div>
+
+    <!-- Add User -->
+    <div style="margin-bottom:20px;">
+        <div style="display:flex; gap:12px; flex-wrap: wrap;">
+            <input type="text" id="newUserName" placeholder="Enter name to add" style="flex:1; padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:white;">
+            <button id="addUserBtn" style="padding:8px 16px; border-radius:12px; background:var(--blue); color:white; font-weight:600;">Add User</button>
+        </div>
+    </div>
+
+    <!-- Users Grid -->
+    <div class="grid" id="usersGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px;">
+        {% for user in users %}
+        <div class="card fade-up delay-2" data-user-id="{{ user['id'] }}" data-user-name="{{ user['name'] }}" style="padding:15px; border-radius:12px; background:var(--bg-section);">
+
+            <!-- Header -->
+            <div class="userHeader" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                <span>{{ user['name'] }} - {{ user['roles'] or 'No Roles' }}</span>
+                <span style="font-size:18px;">&#9662;</span>
+            </div>
+
+            <!-- Dropdown Content -->
+            <div class="userDropdown" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1); transition: all 0.2s ease;">
+
+                <!-- Roles -->
+                <div style="margin-bottom:10px;">
+                    <label style="font-weight:600;">Roles:</label>
+                    <select class="roleSelect" multiple style="width:100%; padding:8px 12px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:white;">
+                        {% for role_option in ROLE_OPTIONS %}
+                            <option value="{{ role_option }}" {% if role_option in (user['roles'] or '').split(',') %}selected{% endif %}>{{ role_option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Last Login -->
+                <div style="margin-bottom:10px; font-size:13px; color:var(--text-muted);">
+                    Last Login: {{ user['last_login'] or 'Never' }}
+                </div>
+
+                <!-- Actions -->
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <button class="resetBtn" style="flex:1; padding:6px 10px; border-radius:12px; background:var(--danger); color:white;">Reset PIN</button>
+                    <button class="removeBtn" style="flex:1; padding:6px 10px; border-radius:12px; background:rgba(255,90,90,0.5); color:white;">Remove User</button>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // --- Dropdown toggle with smooth animation ---
+    document.querySelectorAll(".userHeader").forEach(header => {
+        header.addEventListener("click", () => {
+            const dropdown = header.nextElementSibling;
+            if (dropdown.style.display === "none" || dropdown.style.display === "") {
+                dropdown.style.display = "block";
+                dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+            } else {
+                dropdown.style.maxHeight = "0px";
+                setTimeout(() => dropdown.style.display = "none", 200);
+            }
+        });
+    });
+
+    // --- Add User ---
+    document.getElementById("addUserBtn").addEventListener("click", () => {
+        const name = document.getElementById("newUserName").value.trim();
+        if (!name) return alert("Please enter a name.");
+        if ([...document.querySelectorAll('.card')].some(c => c.dataset.userName === name)) {
+            return alert("This user already exists.");
+        }
+
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.style.display = "none";
+
+        const actionInput = document.createElement("input");
+        actionInput.name = "action";
+        actionInput.value = "add_user";
+        form.appendChild(actionInput);
+
+        const nameInput = document.createElement("input");
+        nameInput.name = "user_name";
+        nameInput.value = name;
+        form.appendChild(nameInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    });
+
+// --- Save All Roles ---
+document.getElementById("saveAllBtn").addEventListener("click", () => {
+    // Create a hidden form to submit roles
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.style.display = "none";
+
+    // Action input
+    const actionInput = document.createElement("input");
+    actionInput.name = "action";
+    actionInput.value = "save_all";
+    form.appendChild(actionInput);
+
+    // Loop through all user cards
+    document.querySelectorAll(".card").forEach(card => {
+        const userId = card.dataset.userId;
+
+        // Skip placeholder users
+        if (!userId || userId === "0") return;
+
+        // Get all selected roles
+        const select = card.querySelector(".roleSelect");
+        const selectedRoles = [...select.selectedOptions].map(o => o.value);
+
+        // Send as single comma-separated string
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = `roles_${userId}`;
+        input.value = selectedRoles.join(","); // <-- ensures all roles sent correctly
+        form.appendChild(input);
+    });
+
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
+});
+
+
+
+
+    // --- Reset PIN / Remove User ---
+    document.querySelectorAll(".resetBtn, .removeBtn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const card = btn.closest(".card");
+            const userId = card.dataset.userId;
+            const userName = card.dataset.userName;
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.style.display = "none";
+
+            const actionInput = document.createElement("input");
+            actionInput.name = "action";
+            actionInput.value = btn.classList.contains("resetBtn") ? "reset_pin" : "remove";
+            form.appendChild(actionInput);
+
+            const idInput = document.createElement("input");
+            idInput.name = "user_id";
+            idInput.value = userId;
+            form.appendChild(idInput);
+
+            if (btn.classList.contains("removeBtn") && !confirm(`Are you sure you want to remove ${userName}?`)) return;
+
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
+
+});
+</script>
+{% endblock %}
