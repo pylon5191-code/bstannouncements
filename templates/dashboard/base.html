@@ -176,6 +176,7 @@
     <div class="nav">
       <a href="{{ url_for('dashboard') }}" class="{% if active=='dashboard' %}active{% endif %}">Dashboard</a>
       <a href="{{ url_for('history') }}" class="{% if active=='history' %}active{% endif %}">History</a>
+      <a href="{{ url_for('announcements') }}" class="{% if active=='announcements' %}active{% endif %}">Send Announcement/a>
       <a href="{{ url_for('create_season') }}" class="{% if active=='create_season' %}active{% endif %}">Create New Season</a>
       <a href="{{ url_for('manage_team') }}" class="{% if active=='manage-team' %}active{% endif %}">Manage Team</a>
     </div>
@@ -201,3 +202,4 @@
 
 </body>
 </html>
+
