@@ -9,6 +9,9 @@ from flask import (
 from authlib.integrations.flask_client import OAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import HTTPException
+import csv
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 
 
@@ -95,6 +98,22 @@ def init_db():
 
     conn.commit()
     conn.close()
+    
+# ============================================================
+# SENDING BULK EMAILS 
+# ============================================================
+
+def send_bulk_email(subject, html_content, recipients):
+    sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+
+    for email in recipients:
+        message = Mail(
+            from_email="announcements@yourdomain.com",
+            to_emails=email,
+            subject=subject,
+            html_content=html_content
+        )
+        sg.send(message)
 
 # ============================================================
 # USER FUNCTIONS
@@ -501,8 +520,44 @@ ADMIN_NAMES = {"Rainer", "Elaine", "Evan"}
 # ROUTES
 # ============================================================
 
+@app.route("/admin/send-announcement", methods=["GET", "POST"])
+def send_announcement_email():
+    if not session.get("logged_in"):
+        return redirect(url_for("admin_login"))
 
+    if request.method == "POST":
+        csv_file = request.files.get("csv")
+        subject = request.form.get("subject", "").strip()
+        body = request.form.get("body", "").strip()
 
+        if not csv_file or not subject or not body:
+            flash("CSV, subject, and body are required.", "error")
+            return redirect(request.url)
+
+        recipients = []
+
+        try:
+            stream = csv_file.stream.read().decode("utf-8").splitlines()
+            reader = csv.reader(stream)
+
+            for row in reader:
+                if row and "@" in row[0]:
+                    recipients.append(row[0].strip())
+
+        except Exception as e:
+            flash("Invalid CSV file.", "error")
+            return redirect(request.url)
+
+        if not recipients:
+            flash("No valid emails found.", "error")
+            return redirect(request.url)
+
+        send_bulk_email(subject, body, recipients)
+
+        flash(f"Announcement sent to {len(recipients)} recipients.", "success")
+        return redirect(url_for("admin"))
+
+    return render_template("announcements/send_email.html")
 
 
 @app.route("/announcements")
@@ -684,6 +739,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
