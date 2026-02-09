@@ -533,8 +533,6 @@ def send_announcement_email():
     if not session.get("logged_in"):
         return redirect(url_for("admin_login"))
 
-    recipients = None
-
     if request.method == "POST":
         subject = request.form.get("subject", "").strip()
         body = request.form.get("body", "").strip()
@@ -559,25 +557,28 @@ def send_announcement_email():
                     if row and "@" in row[0]:
                         recipients_list.append(row[0].strip())
             except Exception as e:
-                flash("Error processing CSV file.", "error")
+                flash(f"Error processing CSV file: {e}", "error")
                 return redirect(request.url)
 
-        # Only show preview if CSV is used
-        if enable_csv:
-            recipients = recipients_list
-            return render_template(
-                "announcements/announcements.html",
-                recipients=recipients,
-                login_only=False,
-                drafts=get_drafts(),
-                announcements=get_admin_published(),
-                editing_draft=None
-            )
+            if not recipients_list:
+                flash("No valid email addresses found in CSV.", "error")
+                return redirect(request.url)
 
-        # If CSV not used, treat as a general email
-        flash("No CSV uploaded. Nothing processed.", "info")
-        return redirect(request.url)
+            # ✅ Send emails immediately
+            try:
+                send_bulk_email(subject, body, recipients_list)
+                flash(f"Emails sent to {len(recipients_list)} recipients!", "success")
+            except Exception as e:
+                flash(f"Error sending emails: {e}", "error")
+                return redirect(request.url)
 
+            return redirect(url_for("admin"))
+
+        else:
+            flash("Please upload a CSV file to send emails.", "error")
+            return redirect(request.url)
+
+    # GET request: render the form
     return render_template(
         "announcements/announcements.html",
         login_only=False,
@@ -585,6 +586,7 @@ def send_announcement_email():
         announcements=get_admin_published(),
         editing_draft=None
     )
+
 
 
 
@@ -767,6 +769,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
