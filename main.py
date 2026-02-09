@@ -105,18 +105,22 @@ def init_db():
 def send_bulk_email(subject, html_content, recipients):
     from sendgrid import SendGridAPIClient
     from sendgrid.helpers.mail import Mail
-    import os
 
-    sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+    # Hardcoded API key (not recommended for production)
+    sg = SendGridAPIClient("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")
 
     for email in recipients:
         message = Mail(
-            from_email="sammydennehy2011@gmail.com",
+            from_email="1dennehysam@hdsb.ca",
             to_emails=email,
             subject=subject,
             html_content=html_content
         )
-        sg.send(message)
+        try:
+            sg.send(message)
+        except Exception as e:
+            print(f"Error sending to {email}: {e}")
+
 
 
 # ============================================================
@@ -763,6 +767,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
