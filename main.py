@@ -575,8 +575,6 @@ def select_name():
     session["pending_name"] = name
 
     return redirect(url_for("login_page", step="pin"))
-    
-pin = request.form.get("pin")
 
 
 @app.route("/login/pin", methods=["POST"])
@@ -686,6 +684,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
