@@ -19,15 +19,15 @@ app.secret_key = "SUPER_SECRET_KEY_CHANGE_THIS"
 # HARD-CODED GOOGLE OAUTH CONFIG
 # ============================================================
 
-GOOGLE_CLIENT_ID = "180258922956-kee1ap0553jh9sprpou2jdp98do2prnq.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = "970893101025-tfcddrq6204md1vlvms9q5624ucfl1a5.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
 ADMIN_PASSWORD = "bstadmin"
-REDIRECT_URI = "http://127.0.0.1:5000/auth/callback"
+REDIRECT_URI = "https://bstannouncements.onrender.com"
 
 # Initialize LoginManager
 
 
-ALLOWED_EMAIL = "pylon5191@gmail.com"
+ALLOWED_EMAIL = "sammydennehy2011@gmail.com"
 
 oauth = OAuth(app)
 
@@ -677,3 +677,4 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
