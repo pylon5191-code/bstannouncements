@@ -10,8 +10,7 @@ from authlib.integrations.flask_client import OAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import HTTPException
 import csv
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+
 
 
 
@@ -104,16 +103,21 @@ def init_db():
 # ============================================================
 
 def send_bulk_email(subject, html_content, recipients):
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail
+    import os
+
     sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
 
     for email in recipients:
         message = Mail(
-            from_email="announcements@yourdomain.com",
+            from_email="sammydennehy2011@gmail.com",
             to_emails=email,
             subject=subject,
             html_content=html_content
         )
         sg.send(message)
+
 
 # ============================================================
 # USER FUNCTIONS
@@ -739,6 +743,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
