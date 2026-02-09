@@ -1,0 +1,324 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+
+<div class="page-header fade-up delay-1">
+  <h1>Action History</h1>
+  <p>
+    All changes made on the BST Production Portal are recorded here for tracking and accountability.
+  </p>
+</div>
+
+<div class="history-toolbar fade-up delay-2">
+  <div class="search-box">
+    <input type="text" id="historySearch" placeholder="Search history...">
+  </div>
+
+  <div class="filter-box">
+    <select id="historyFilter">
+      <option value="all" selected>All Activity</option>
+      <option value="login">Logins</option>
+      <option value="upload">Uploads</option>
+      <option value="edit">Edits</option>
+      <option value="season">Seasons</option>
+      <option value="admin">Admin Actions</option>
+    </select>
+  </div>
+</div>
+
+<div class="history-container fade-up delay-3">
+
+  {% if history|length == 0 %}
+    <div class="empty-history">
+      <h3>No History Found</h3>
+      <p>Once staff start editing, uploading, or updating seasons, entries will appear here.</p>
+    </div>
+  {% endif %}
+
+  {% for item in history %}
+  <div class="history-row"
+       data-user="{{ item.user_name|lower }}"
+       data-action="{{ item.action|lower }}"
+       data-date="{{ item.date|lower }}">
+
+    <div class="history-left">
+      <div class="history-icon">
+        🕒
+      </div>
+
+      <div class="history-info">
+        <div class="history-title">
+          <span class="history-user">{{ item.user_name }}</span>
+          <span class="history-action">{{ item.action }}</span>
+        </div>
+
+        <div class="history-meta">
+          <span class="meta-pill">{{ item.date }}</span>
+
+          {% if item.category %}
+            <span class="meta-pill category">{{ item.category }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="history-right">
+      <span class="history-badge">Logged</span>
+    </div>
+
+  </div>
+  {% endfor %}
+
+</div>
+<style>
+/* ========================= */
+/*        PAGE HEADER         */
+/* ========================= */
+
+.page-header {
+  margin-bottom: 25px;
+}
+
+.page-header h1 {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0;
+  color: #f2f6ff;
+}
+
+.page-header p {
+  margin-top: 10px;
+  font-size: 15px;
+  color: rgba(230, 235, 255, 0.72);
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* ========================= */
+/*      HISTORY TOOLBAR       */
+/* ========================= */
+
+.history-toolbar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.search-box input {
+  width: 320px;
+  max-width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(20, 24, 40, 0.55);
+  color: #f2f6ff;
+  font-size: 14px;
+  outline: none;
+  backdrop-filter: blur(14px);
+  transition: 0.2s ease;
+}
+
+.search-box input:focus {
+  border-color: rgba(77, 163, 255, 0.55);
+  box-shadow: 0 0 0 4px rgba(77, 163, 255, 0.12);
+}
+
+.filter-box select {
+  width: 220px;
+  max-width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(20, 24, 40, 0.55);
+  color: #f2f6ff;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition: 0.2s ease;
+}
+
+.filter-box select:hover {
+  border-color: rgba(77, 163, 255, 0.35);
+}
+
+/* ========================= */
+/*     HISTORY CONTAINER      */
+/* ========================= */
+
+.history-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ========================= */
+/*        HISTORY ROW         */
+/* ========================= */
+
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 18px;
+  border-radius: 18px;
+  background: rgba(15, 19, 32, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  transition: 0.25s ease;
+}
+
+.history-row:hover {
+  transform: translateY(-3px);
+  border-color: rgba(77, 163, 255, 0.30);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+/* LEFT SIDE */
+.history-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ICON */
+.history-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: rgba(77, 163, 255, 0.12);
+  border: 1px solid rgba(77, 163, 255, 0.25);
+}
+
+/* INFO */
+.history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(230, 235, 255, 0.90);
+}
+
+.history-user {
+  font-weight: 800;
+  color: #ffffff;
+  margin-right: 6px;
+}
+
+.history-action {
+  color: rgba(230, 235, 255, 0.70);
+  font-weight: 500;
+}
+
+/* META PILLS */
+.history-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(230, 235, 255, 0.75);
+}
+
+.meta-pill.category {
+  background: rgba(77, 163, 255, 0.10);
+  border: 1px solid rgba(77, 163, 255, 0.20);
+  color: rgba(77, 163, 255, 0.95);
+}
+
+/* RIGHT SIDE */
+.history-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-badge {
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(77, 163, 255, 0.10);
+  border: 1px solid rgba(77, 163, 255, 0.22);
+  color: rgba(77, 163, 255, 0.95);
+}
+
+/* ========================= */
+/*       EMPTY HISTORY        */
+/* ========================= */
+
+.empty-history {
+  text-align: center;
+  padding: 55px 30px;
+  border-radius: 20px;
+  background: rgba(15, 19, 32, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.empty-history h3 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 800;
+  color: #f2f6ff;
+}
+
+.empty-history p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: rgba(230, 235, 255, 0.70);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+<style>
+<script>
+const searchInput = document.getElementById("historySearch");
+const filterSelect = document.getElementById("historyFilter");
+const rows = document.querySelectorAll(".history-row");
+
+function applyFilters() {
+  const query = searchInput.value.toLowerCase();
+  const filter = filterSelect.value;
+
+  rows.forEach(row => {
+    const user = row.dataset.user || "";
+    const action = row.dataset.action || "";
+    const date = row.dataset.date || "";
+
+    let matchesSearch =
+      user.includes(query) ||
+      action.includes(query) ||
+      date.includes(query);
+
+    let matchesFilter = true;
+
+    if (filter !== "all") {
+      matchesFilter = action.includes(filter);
+    }
+
+    row.style.display = (matchesSearch && matchesFilter) ? "flex" : "none";
+  });
+}
+
+searchInput.addEventListener("input", applyFilters);
+filterSelect.addEventListener("change", applyFilters);
+</script>
+
+{% endblock %}

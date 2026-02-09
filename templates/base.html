@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}BST Portal{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Poppins font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page fade-up">
+    <header class="header">
+        <div class="logo-row">
+            <img src="{{ url_for('static', filename='bstlogo.png') }}" alt="BST Logo" class="logo">
+            <div class="titles">
+                <h1>Burlington Student Theatre</h1>
+                <h2>Production Portal</h2>
+            </div>
+        </div>
+        <nav class="nav">
+            <a href="{{ url_for('admin') }}">Admin</a>
+        </nav>
+    </header>
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script>
+    // Simple fade-up on load
+    window.addEventListener('load', () => {
+        document.querySelectorAll('.fade-up').forEach(el => {
+            el.classList.add('fade-up-visible');
+        });
+    });
+</script>
+</body>
+</html>

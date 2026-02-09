@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - BST Production Portal</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #05070f;
+      --bg-panel: rgba(18, 24, 44, 0.68);
+      --bg-panel-2: rgba(25, 33, 58, 0.55);
+
+      --border: rgba(120, 170, 255, 0.12);
+      --border-strong: rgba(120, 170, 255, 0.18);
+
+      --text-main: #eaf1ff;
+      --text-muted: rgba(234, 241, 255, 0.72);
+
+      --blue: #4da3ff;
+      --blue-soft: rgba(77, 163, 255, 0.18);
+      --blue-glow: rgba(77, 163, 255, 0.45);
+
+      --shadow: 0px 25px 65px rgba(0, 0, 0, 0.65);
+      --radius: 18px;
+
+      --danger: rgba(255, 90, 90, 0.85);
+      --success: rgba(100, 255, 170, 0.85);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, rgba(77, 163, 255, 0.18), transparent 55%),
+                  linear-gradient(180deg, #040611, #070a16, #05070f);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("https://www.transparenttextures.com/patterns/black-felt.png");
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ========================= */
+    /*        ANIMATIONS         */
+    /* ========================= */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0px); }
+    }
+
+    .fade-up {
+      opacity: 0;
+      animation: fadeUp 0.85s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.10s; }
+    .delay-2 { animation-delay: 0.20s; }
+    .delay-3 { animation-delay: 0.35s; }
+    .delay-4 { animation-delay: 0.50s; }
+    .delay-5 { animation-delay: 0.65s; }
+
+    /* ========================= */
+    /*          SIDEBAR          */
+    /* ========================= */
+    .sidebar {
+      width: 270px;
+      height: 100vh;
+      background: rgba(6, 8, 18, 0.65);
+      backdrop-filter: blur(18px);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 5;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar-brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0px 0px 20px rgba(77, 163, 255, 0.22);
+      border: 1px solid rgba(77, 163, 255, 0.15);
+    }
+
+    .sidebar-brand h2 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      line-height: 1.1;
+    }
+
+    .sidebar-brand p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .nav a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+      transition: 0.25s ease;
+    }
+
+    .nav a:hover {
+      background: rgba(77, 163, 255, 0.08);
+      border: 1px solid rgba(77, 163, 255, 0.20);
+      color: var(--text-main);
+      transform: translateY(-2px);
+    }
+
+    .nav a.active {
+      background: rgba(77, 163, 255, 0.14);
+      border: 1px solid rgba(77, 163, 255, 0.25);
+      color: var(--text-main);
+      box-shadow: 0px 0px 30px rgba(77, 163, 255, 0.10);
+    }
+
+    .admin-tag {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    /* ========================= */
+    /*      PROFILE CARD         */
+    /* ========================= */
+    .profile-card {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .profile-card img {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid rgba(77, 163, 255, 0.15);
+      box-shadow: 0px 0px 18px rgba(77, 163, 255, 0.18);
+      object-fit: cover;
+    }
+
+    .profile-card .name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .profile-card .role {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ========================= */
+    /*         MAIN AREA         */
+    /* ========================= */
+    .main {
+      flex: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 42px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 650px;
+    }
+
+    /* ========================= */
+    /*       SEASON SELECT       */
+    /* ========================= */
+    .season-box {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 520px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .season-box label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    select:focus {
+      border: 1px solid rgba(77, 163, 255, 0.35);
+      box-shadow: 0px 0px 20px rgba(77, 163, 255, 0.12);
+    }
+
+    option {
+      background: #0b1020;
+      color: white;
+    }
+
+    /* ========================= */
+    /*          GRID             */
+    /* ========================= */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 30px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(18, 24, 44, 0.55);
+      border: 1px solid rgba(120, 170, 255, 0.12);
+      backdrop-filter: blur(18px);
+      box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.35);
+      transition: 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border: 1px solid rgba(77, 163, 255, 0.20);
+      box-shadow: 0px 0px 55px rgba(77, 163, 255, 0.08);
+    }
+
+    .card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .mini-stat {
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(77, 163, 255, 0.95);
+    }
+
+    /* ========================= */
+    /*        FLASH MSG          */
+    /* ========================= */
+    .flash {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      max-width: 650px;
+    }
+
+    .flash.error {
+      border: 1px solid rgba(255, 90, 90, 0.25);
+      background: rgba(255, 90, 90, 0.08);
+      color: rgba(255, 170, 170, 0.95);
+    }
+
+    .flash.success {
+      border: 1px solid rgba(100, 255, 170, 0.25);
+      background: rgba(100, 255, 170, 0.08);
+      color: rgba(180, 255, 220, 0.95);
+    }
+
+    /* ========================= */
+    /*       RESPONSIVE          */
+    /* ========================= */
+    @media (max-width: 900px) {
+      body {
+        overflow: auto;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar fade-up delay-1">
+
+    <div class="sidebar-brand">
+      <img src="{{ url_for('static', filename='bstlogo.png') }}" alt="BST Logo">
+      <div>
+        <h2>BST Portal</h2>
+        <p>Production Dashboard</p>
+      </div>
+    </div>
+
+    <div class="nav">
+      <a href="{{ url_for('dashboard') }}" class="active">
+        Dashboard
+      </a>
+
+      <a href="{{ url_for('history') }}">
+        History
+      </a>
+
+      <a href="{{ url_for('create_season') }}">
+        Create a Season
+      </a>
+
+      <a href="{{ url_for('manage_team') }}">
+        Manage Team
+      </a>
+    </div>
+
+    <div class="profile-card fade-up delay-2">
+      <img src="{{ google_picture }}" alt="Profile Picture">
+      <div>
+        <div class="name">{{ name }}</div>
+        <div class="role">
+          {% if is_admin %}
+            Administrator
+          {% else %}
+            Production Staff
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <div class="header fade-up delay-2">
+      <h1>Hey {{ name }}, how can we help you today?</h1>
+      <p>
+        Welcome to the Burlington Student Theatre Production Portal.
+        Select a season below to open the season management panel and begin working.
+      </p>
+    </div>
+
+    <!-- SEASON SELECT -->
+    <div class="season-box fade-up delay-3">
+      <label>Select a Season</label>
+
+      <select id="seasonSelect">
+        <option value="" disabled selected>Select a season...</option>
+
+        {% for season in seasons %}
+          <option value="{{ season.id }}">{{ season.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash {{ category }} fade-up delay-4">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- DASHBOARD CARDS -->
+    <div class="grid fade-up delay-4">
+
+      <div class="card">
+        <h3>Production Portal Status</h3>
+        <p>
+          The system is running normally. Use the sidebar to navigate, or select a season to begin editing files.
+        </p>
+        <div class="mini-stat">Online</div>
+      </div>
+
+      <div class="card">
+        <h3>Quick Tip</h3>
+        <p>
+          All edits and uploads are logged. If anything is changed or removed, it will appear in History.
+        </p>
+        <div class="mini-stat">History Tracking Enabled</div>
+      </div>
+
+      <div class="card">
+        <h3>Season Management</h3>
+        <p>
+          Each season contains all show data including cast lists, calendars, rehearsal schedules, and file uploads.
+        </p>
+        <div class="mini-stat">{{ seasons|length }} Seasons Available</div>
+      </div>
+
+      <div class="card">
+        <h3>Security</h3>
+        <p>
+          Login access is restricted to authorized production accounts only. Each staff member has their own PIN.
+        </p>
+        <div class="mini-stat">PIN Secured</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const dropdown = document.getElementById("seasonSelect");
+
+    dropdown.addEventListener("change", function() {
+      const seasonId = this.value;
+      if (!seasonId) return;
+
+      window.location.href = "/season/" + seasonId;
+    });
+  </script>
+
+</body>
+</html>
