@@ -613,7 +613,7 @@ def login_pin():
         session["user_name"] = user["name"]
 
         # Use roles from DB, fallback if empty
-        session["user_role"] = user.get("roles") or "Production Staff"
+        session["user_role"] = user["roles"] if user["roles"] else "Production Staff"
 
         session.pop("pending_user_id", None)
         session.pop("pending_name", None)
@@ -684,6 +684,7 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
