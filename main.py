@@ -602,13 +602,20 @@ def login_pin():
         return redirect(url_for("login_page", step="pin"))
 
     # RETURNING USER: VERIFY PIN
+    pin = request.form.get("pin")  # <-- ADD THIS
+
+    if not pin:
+        flash("Please enter your PIN.", "error")
+        return redirect(url_for("login_page", step="pin"))
+
     if verify_pin(user_id, pin):
         user = get_user_by_id(user_id)
+
         session["user_id"] = user["id"]
         session["user_name"] = user["name"]
 
-        # Instead of "standard" use actual roles from DB
-        session["user_role"] = user["roles"] or "Production Staff"
+        # Use roles from DB, fallback if empty
+        session["user_role"] = user.get("roles") or "Production Staff"
 
         session.pop("pending_user_id", None)
         session.pop("pending_name", None)
@@ -616,10 +623,10 @@ def login_pin():
 
         return redirect(url_for("dashboard"))
 
-        flash("Incorrect PIN.", "error")
-        return redirect(url_for("login_page", step="pin"))
+    # WRONG PIN
+    flash("Incorrect PIN.", "error")
+    return redirect(url_for("login_page", step="pin"))
 
-    return redirect(url_for("login_page"))
 
 
 # ---------------- DASHBOARD ---------------- #
@@ -679,5 +686,6 @@ init_db()
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
